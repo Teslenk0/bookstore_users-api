@@ -2,6 +2,7 @@ package users
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/Teslenk0/bookstore_users-api/domain/users"
 	"github.com/Teslenk0/bookstore_users-api/services"
@@ -17,7 +18,22 @@ import (
 
 //GetUser - function to handle GET request
 func GetUser(c *gin.Context) {
-	c.String(http.StatusNotImplemented, "TODO")
+
+	//Get the id from the GET request
+	userID, userErr := strconv.ParseInt(c.Param("user_id"), 10, 64)
+	if userErr != nil {
+		err := errors.NewBadRequestError("Invalid User Id")
+		c.JSON(err.Status, err)
+		return
+	}
+
+	result, getErr := services.GetUser(userID)
+	if getErr != nil {
+		c.JSON(getErr.Status, getErr)
+		return
+	}
+
+	c.JSON(http.StatusOK, result)
 }
 
 //CreateUser - function to create a new given user
@@ -26,7 +42,6 @@ func CreateUser(c *gin.Context) {
 
 	//Tries to parse the request to JSON
 	if err := c.ShouldBindJSON(&user); err != nil {
-		//TODO: Handle json error (bad request)
 		restErr := errors.NewBadRequestError("Invalid Json Object")
 		c.JSON(restErr.Status, restErr)
 		return
@@ -35,7 +50,6 @@ func CreateUser(c *gin.Context) {
 	//Tries to create the user and persist it
 	result, saveErr := services.CreateUser(user)
 	if saveErr != nil {
-		// TODO: handle error
 		c.JSON(saveErr.Status, saveErr)
 		return
 	}
