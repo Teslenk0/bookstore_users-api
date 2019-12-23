@@ -13,7 +13,7 @@ func GetUser(userID int64) (*users.User, *errors.RestError) {
 		return nil, errors.NewBadRequestError("User Identifier Must be Greater than 0")
 	}
 
-	result := &users.User{ID: userID}
+	var result = &users.User{ID: userID}
 	if err := result.Get(); err != nil {
 		return nil, err
 	}

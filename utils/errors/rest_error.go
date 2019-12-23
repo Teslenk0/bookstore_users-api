@@ -30,3 +30,13 @@ func NewNotFoundError(message string) *RestError {
 	}
 	return &restErr
 }
+
+//NewInternalServerError - Function to create 500 errors
+func NewInternalServerError(message string) *RestError {
+	var restErr = RestError{
+		Message: `"` + message + `"`,
+		Status:  http.StatusInternalServerError,
+		Error:   "internal_server_error",
+	}
+	return &restErr
+}
