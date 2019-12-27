@@ -5,25 +5,19 @@ import (
 	"github.com/Teslenk0/bookstore_users-api/datasources/mysql/usersdb"
 	"github.com/Teslenk0/bookstore_users-api/utils/date"
 	"github.com/Teslenk0/bookstore_users-api/utils/errors"
-	"github.com/go-sql-driver/mysql"
-	"strings"
+	"github.com/Teslenk0/bookstore_users-api/utils/mysql_utils"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 //Data access Object
 //Interacts with DB
 
 const (
-	//ERROR HANDLING
-	emptyResultSet   = "no rows in result set"
-	indexUniqueEmail = "for key 'users_email_uindex'"
-
 	//QUERIES
 	queryInsertUser = "INSERT INTO users(first_name, last_name, email, date_created) VALUES (?,?,?,?);"
 	queryGetUser    = "SELECT * FROM users WHERE ID=?;"
-)
-
-var (
-	usersDB = make(map[int64]*User)
+	queryUpdateUser = "UPDATE users SET first_name=?, last_name=?, email=? WHERE ID=?;"
+	queryDeleteUser = "DELETE FROM users WHERE ID=?;"
 )
 
 //Get - Gets user by ID from DB - act like method
@@ -45,12 +39,8 @@ func (user *User) Get() *errors.RestError {
 	//Populates the user given with the data from DB
 	if getErr := result.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated); getErr != nil {
 
-		//Asks if result is empty
-		if strings.Contains(getErr.Error(), emptyResultSet) {
-			return errors.NewNotFoundError(fmt.Sprintf("user %d does not exists", user.ID))
-		}
+		return mysql_utils.ParseError(getErr)
 
-		return errors.NewInternalServerError(fmt.Sprintf("error when trying to get user: %s", getErr.Error()))
 	}
 
 	return nil
@@ -74,30 +64,51 @@ func (user *User) Save() *errors.RestError {
 	//Exec the statement
 	insertResult, saveErr := stmt.Exec(user.FirstName, user.LastName, user.Email, user.DateCreated)
 	if saveErr != nil {
-
-		//Attempts to convert to mysql error
-		sqlErr, ok := saveErr.(*mysql.MySQLError)
-		if !ok {
-			return errors.NewInternalServerError("error when attempting to convert to mysql error")
-		}
-
-		//Check error by number
-		switch sqlErr.Number {
-		case 1062:
-			return errors.NewBadRequestError(fmt.Sprintf("email %s already exists", user.Email))
-
-		default:
-			return errors.NewInternalServerError(fmt.Sprintf("error when tying to save user: %s", saveErr.Error()))
-		}
+		return mysql_utils.ParseError(saveErr)
 	}
 
 	//We get the last inserted id
 	userId, err := insertResult.LastInsertId()
 	if err != nil {
-		return errors.NewInternalServerError(fmt.Sprintf("error when tying to save user: %s", err.Error()))
+		return mysql_utils.ParseError(err)
 	}
 
 	user.ID = userId
 
+	return nil
+}
+
+//Update - updates data from the database with the given one
+func (user *User) Update() *errors.RestError {
+
+	stmt, err := users_db.Client.Prepare(queryUpdateUser)
+	if err != nil {
+		return errors.NewInternalServerError(fmt.Sprintf("internal server error: %s", err.Error()))
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(user.FirstName, user.LastName, user.Email, user.ID)
+	if err != nil {
+		return mysql_utils.ParseError(err)
+	}
+	return nil
+
+}
+
+//Delete - deletes a given user
+func (user *User) Delete() *errors.RestError{
+
+	stmt, err := users_db.Client.Prepare(queryDeleteUser)
+	if err != nil{
+		return errors.NewInternalServerError(fmt.Sprintf("internal server error: %s", err.Error()))
+	}
+
+	defer stmt.Close()
+	
+	_, delErr := stmt.Exec(user.ID)
+	if delErr != nil{
+		return mysql_utils.ParseError(delErr)
+	}
 	return nil
 }

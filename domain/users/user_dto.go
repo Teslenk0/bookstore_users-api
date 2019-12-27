@@ -19,6 +19,8 @@ type User struct {
 //Validate - Function to validates user data
 func (user *User) Validate() *errors.RestError {
 
+	user.FirstName = strings.TrimSpace(strings.ToLower(user.FirstName))
+	user.LastName = strings.TrimSpace(strings.ToLower(user.LastName))
 	user.Email = strings.TrimSpace(strings.ToLower(user.Email))
 
 	if user.Email == "" {
