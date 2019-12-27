@@ -9,8 +9,9 @@ func mapUrls() {
 
 	//---------------------- GET INFORMATION -----------------------------
 	router.GET("/ping", ping.Ping)
+
 	router.GET("/users/:user_id", users.Get)
-	//router.GET("users/search", users.SearchUser)
+	router.GET("/internal/users/search", users.Search)
 
 	//---------------------- SAVES INFORMATION --------------------------------
 

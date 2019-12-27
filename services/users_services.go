@@ -3,6 +3,7 @@ package services
 //Bussiness logic of our users
 import (
 	"github.com/Teslenk0/bookstore_users-api/domain/users"
+	"github.com/Teslenk0/bookstore_users-api/utils/date"
 	"github.com/Teslenk0/bookstore_users-api/utils/errors"
 )
 
@@ -29,6 +30,9 @@ func CreateUser(user users.User) (*users.User, *errors.RestError) {
 		return nil, err
 	}
 
+	user.Status = users.StatusActive
+	user.DateCreated = date.GetNowDBString()
+
 	if err := user.Save(); err != nil {
 		return nil, err
 	}
@@ -43,7 +47,6 @@ func UpdateUser(isPartial bool, user users.User) (*users.User, *errors.RestError
 	if err != nil {
 		return nil, err
 	}
-
 
 	if isPartial {
 
@@ -75,7 +78,7 @@ func UpdateUser(isPartial bool, user users.User) (*users.User, *errors.RestError
 }
 
 //DeleteUser - this functions looks for a user and deletes it
-func DeleteUser(userID int64) *errors.RestError{
+func DeleteUser(userID int64) *errors.RestError {
 
 	if userID <= 0 {
 		return errors.NewBadRequestError("user identifier must be greater than 0")
@@ -83,4 +86,10 @@ func DeleteUser(userID int64) *errors.RestError{
 
 	var user = &users.User{ID: userID}
 	return user.Delete()
+}
+
+//FindByStatus - this functions asks the dao for users with the given status
+func Search(status string) ([]users.User, *errors.RestError) {
+	dao := &users.User{}
+	return dao.FindByStatus(status)
 }
