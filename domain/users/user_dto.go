@@ -19,8 +19,11 @@ type User struct {
 	Email       string `json:"email"`
 	DateCreated string `json:"date_created"`
 	Status      string `json:"status"`
-	Password    string `json:"-"`
-}
+	Password    string `json:"password"`
+};
+
+//Alias to a slice of users
+type Users []User
 
 //Validate - Function to validates user data
 func (user *User) Validate() *errors.RestError {

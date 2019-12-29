@@ -1,0 +1,9 @@
+{"level":"info","time":"2019-12-29T19:11:56.895-0300","msg":"about to start the application"}
+{"level":"info","time":"2019-12-29T19:19:10.236-0300","msg":"about to start the application"}
+{"level":"info","time":"2019-12-29T19:20:56.646-0300","msg":"about to start the application"}
+{"level":"info","time":"2019-12-29T19:21:06.097-0300","msg":"about to start the application"}
+{"level":"error","time":"2019-12-29T19:21:09.750-0300","msg":"error when trying to prepare the get user statement","error":"Error 1064: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ID=?' at line 1"}
+{"level":"info","time":"2019-12-29T19:24:36.404-0300","msg":"about to start the application"}
+{"level":"info","time":"2019-12-29T19:38:46.318-0300","msg":"about to start the application"}
+{"level":"error","time":"2019-12-29T19:38:50.345-0300","msg":"error when trying to get user by id","error":"sql: no rows in result set"}
+{"level":"info","time":"2019-12-29T19:44:25.223-0300","msg":"about to start the application"}
