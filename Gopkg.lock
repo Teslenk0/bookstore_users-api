@@ -10,6 +10,19 @@
   version = "v0.3.1"
 
 [[projects]]
+  branch = "master"
+  digest = "1:bed5c5e92fd51e71a92463eb65e14b411f881283cb6e0c5a8321e6af64135994"
+  name = "github.com/Teslenk0/bookstore_utils-go"
+  packages = [
+    "crypto_utils",
+    "date",
+    "logger",
+    "rest_errors",
+  ]
+  pruneopts = "UT"
+  revision = "7071d92279cd42d3d7092ce19513668c8d22d152"
+
+[[projects]]
   digest = "1:3ee1d175a75b911a659fbd860060874c4f503e793c5870d13e5a0ede529a63cf"
   name = "github.com/gin-contrib/sse"
   packages = ["."]
@@ -256,10 +269,12 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/Teslenk0/bookstore_utils-go/crypto_utils",
+    "github.com/Teslenk0/bookstore_utils-go/date",
+    "github.com/Teslenk0/bookstore_utils-go/logger",
+    "github.com/Teslenk0/bookstore_utils-go/rest_errors",
     "github.com/gin-gonic/gin",
     "github.com/go-sql-driver/mysql",
-    "go.uber.org/zap",
-    "go.uber.org/zap/zapcore",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

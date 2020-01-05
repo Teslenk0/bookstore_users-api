@@ -3,19 +3,19 @@ package services
 //Bussiness logic of our users
 import (
 	"github.com/Teslenk0/bookstore_users-api/domain/users"
-	"github.com/Teslenk0/bookstore_users-api/utils/crypto_utils"
-	"github.com/Teslenk0/bookstore_users-api/utils/date"
-	"github.com/Teslenk0/bookstore_users-api/utils/errors"
+	"github.com/Teslenk0/bookstore_utils-go/crypto_utils"
+	"github.com/Teslenk0/bookstore_utils-go/date"
+	"github.com/Teslenk0/bookstore_utils-go/rest_errors"
 )
 
 //Interface with methods
 type usersServiceInterface interface {
-	GetUser(userID int64) (*users.User, *errors.RestError)
-	CreateUser(user users.User) (*users.User, *errors.RestError)
-	UpdateUser(isPartial bool, user users.User) (*users.User, *errors.RestError)
-	DeleteUser(userID int64) *errors.RestError
-	SearchUser(status string) (users.Users, *errors.RestError)
-	LoginUser(users.LoginRequest) (*users.User, *errors.RestError)
+	GetUser(userID int64) (*users.User, *rest_errors.RestError)
+	CreateUser(user users.User) (*users.User, *rest_errors.RestError)
+	UpdateUser(isPartial bool, user users.User) (*users.User, *rest_errors.RestError)
+	DeleteUser(userID int64) *rest_errors.RestError
+	SearchUser(status string) (users.Users, *rest_errors.RestError)
+	LoginUser(users.LoginRequest) (*users.User, *rest_errors.RestError)
 }
 
 //Struct
@@ -28,10 +28,10 @@ var (
 )
 
 //GetUser - this function interacts with DB and gets a user
-func (s *usersService) GetUser(userID int64) (*users.User, *errors.RestError) {
+func (s *usersService) GetUser(userID int64) (*users.User, *rest_errors.RestError) {
 
 	if userID <= 0 {
-		return nil, errors.NewBadRequestError("User Identifier Must be Greater than 0")
+		return nil, rest_errors.NewBadRequestError("User Identifier Must be Greater than 0")
 	}
 
 	var result = &users.User{ID: userID}
@@ -43,7 +43,7 @@ func (s *usersService) GetUser(userID int64) (*users.User, *errors.RestError) {
 }
 
 //CreateUser - this function interacts with DAO and creates a user, the error must be at the final of the return statement
-func (s *usersService) CreateUser(user users.User) (*users.User, *errors.RestError) {
+func (s *usersService) CreateUser(user users.User) (*users.User, *rest_errors.RestError) {
 
 	//User validates itself
 	if err := user.Validate(); err != nil {
@@ -62,7 +62,7 @@ func (s *usersService) CreateUser(user users.User) (*users.User, *errors.RestErr
 }
 
 //UpdateUser - this function updates the user with the data given
-func (s *usersService) UpdateUser(isPartial bool, user users.User) (*users.User, *errors.RestError) {
+func (s *usersService) UpdateUser(isPartial bool, user users.User) (*users.User, *rest_errors.RestError) {
 
 	current, err := UsersService.GetUser(user.ID)
 	if err != nil {
@@ -99,10 +99,10 @@ func (s *usersService) UpdateUser(isPartial bool, user users.User) (*users.User,
 }
 
 //DeleteUser - this functions looks for a user and deletes it
-func (s *usersService) DeleteUser(userID int64) *errors.RestError {
+func (s *usersService) DeleteUser(userID int64) *rest_errors.RestError {
 
 	if userID <= 0 {
-		return errors.NewBadRequestError("user identifier must be greater than 0")
+		return rest_errors.NewBadRequestError("user identifier must be greater than 0")
 	}
 
 	var user = &users.User{ID: userID}
@@ -110,12 +110,12 @@ func (s *usersService) DeleteUser(userID int64) *errors.RestError {
 }
 
 //FindByStatus - this functions asks the dao for users with the given status
-func (s *usersService) SearchUser(status string) (users.Users, *errors.RestError) {
+func (s *usersService) SearchUser(status string) (users.Users, *rest_errors.RestError) {
 	dao := &users.User{}
 	return dao.FindByStatus(status)
 }
 
-func (s *usersService) LoginUser(request users.LoginRequest) (*users.User, *errors.RestError) {
+func (s *usersService) LoginUser(request users.LoginRequest) (*users.User, *rest_errors.RestError) {
 	encryptedPassword := crypto_utils.GetMd5(request.Password)
 	dao := &users.User{
 		Email:    request.Email,

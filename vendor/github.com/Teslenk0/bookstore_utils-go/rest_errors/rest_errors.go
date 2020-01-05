@@ -1,4 +1,4 @@
-package errors
+package rest_errors
 
 import (
 	"errors"
@@ -10,9 +10,10 @@ type RestError struct {
 	Message string `json:"message"`
 	Status  int    `json:"status"`
 	Error   string `json:"error"`
+	Causes []interface{} `json:"causes"`
 }
 
-func NewError(msg string)error{
+func NewError(msg string) error {
 	return errors.New(msg)
 }
 
@@ -29,7 +30,7 @@ func NewBadRequestError(message string) *RestError {
 //NewNotFoundError - Function to create not found errors
 func NewNotFoundError(message string) *RestError {
 	var restErr = RestError{
-		Message: `"` + message + `"`,
+		Message: message,
 		Status:  http.StatusNotFound,
 		Error:   "not_found",
 	}
@@ -37,11 +38,14 @@ func NewNotFoundError(message string) *RestError {
 }
 
 //NewInternalServerError - Function to create 500 errors
-func NewInternalServerError(message string) *RestError {
+func NewInternalServerError(message string, err error) *RestError {
 	var restErr = RestError{
-		Message: `"` + message + `"`,
+		Message: message,
 		Status:  http.StatusInternalServerError,
 		Error:   "internal_server_error",
+	}
+	if err != nil {
+		restErr.Causes = append(restErr.Causes, err.Error())
 	}
 	return &restErr
 }

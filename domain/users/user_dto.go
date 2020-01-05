@@ -2,9 +2,8 @@ package users
 
 //This is the data transfer object, it moves between persistence and application
 import (
+	"github.com/Teslenk0/bookstore_utils-go/rest_errors"
 	"strings"
-
-	"github.com/Teslenk0/bookstore_users-api/utils/errors"
 )
 
 const (
@@ -27,7 +26,7 @@ type User struct {
 type Users []User
 
 //Validate - Function to validates user data
-func (user *User) Validate() *errors.RestError {
+func (user *User) Validate() *rest_errors.RestError {
 
 	user.FirstName = strings.TrimSpace(strings.ToLower(user.FirstName))
 	user.LastName = strings.TrimSpace(strings.ToLower(user.LastName))
@@ -35,11 +34,11 @@ func (user *User) Validate() *errors.RestError {
 	user.Password = strings.TrimSpace(user.Password)
 
 	if user.Email == "" {
-		return errors.NewBadRequestError("invalid email address")
+		return rest_errors.NewBadRequestError("invalid email address")
 	}
 
 	if user.Password == "" {
-		return errors.NewBadRequestError("invalid password")
+		return rest_errors.NewBadRequestError("invalid password")
 	}
 
 	return nil
