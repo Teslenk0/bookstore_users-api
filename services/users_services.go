@@ -15,11 +15,11 @@ type usersServiceInterface interface {
 	UpdateUser(isPartial bool, user users.User) (*users.User, *errors.RestError)
 	DeleteUser(userID int64) *errors.RestError
 	SearchUser(status string) (users.Users, *errors.RestError)
+	LoginUser(users.LoginRequest) (*users.User, *errors.RestError)
 }
 
 //Struct
 type usersService struct {
-
 }
 
 //Implementing the interface
@@ -113,4 +113,16 @@ func (s *usersService) DeleteUser(userID int64) *errors.RestError {
 func (s *usersService) SearchUser(status string) (users.Users, *errors.RestError) {
 	dao := &users.User{}
 	return dao.FindByStatus(status)
+}
+
+func (s *usersService) LoginUser(request users.LoginRequest) (*users.User, *errors.RestError) {
+	encryptedPassword := crypto_utils.GetMd5(request.Password)
+	dao := &users.User{
+		Email:    request.Email,
+		Password: encryptedPassword,
+	}
+	if err := dao.FindByEmailAndPassword(); err != nil {
+		return nil, err
+	}
+	return dao, nil
 }

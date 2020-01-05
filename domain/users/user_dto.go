@@ -9,6 +9,7 @@ import (
 
 const (
 	StatusActive = "active"
+	StatusUsed= "used"
 )
 
 // User - This is the model

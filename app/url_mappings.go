@@ -13,9 +13,10 @@ func mapUrls() {
 	router.GET("/users/:user_id", users.Get)
 	router.GET("/internal/users/search", users.Search)
 
-	//---------------------- SAVES INFORMATION --------------------------------
+	//---------------------- POST INFORMATION --------------------------------
 
 	router.POST("/users", users.Create)
+	router.POST("/users/login", users.Login)
 
 	//------------------- UPDATE INFORMATION ----------------------------------
 

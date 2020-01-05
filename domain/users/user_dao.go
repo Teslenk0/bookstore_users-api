@@ -5,6 +5,7 @@ import (
 	"github.com/Teslenk0/bookstore_users-api/datasources/mysql/usersdb"
 	"github.com/Teslenk0/bookstore_users-api/logger"
 	"github.com/Teslenk0/bookstore_users-api/utils/errors"
+	"github.com/Teslenk0/bookstore_users-api/utils/mysql_utils"
 	_ "github.com/go-sql-driver/mysql"
 	"strings"
 )
@@ -14,11 +15,12 @@ import (
 
 const (
 	//QUERIES
-	queryInsertUser       = "INSERT INTO users(first_name, last_name, email, date_created, status, password) VALUES (?,?,?,?,?,?);"
-	queryGetUser          = "SELECT ID, first_name, last_name, email, date_created, status FROM users WHERE ID=?;"
-	queryUpdateUser       = "UPDATE users SET first_name=?, last_name=?, email=? WHERE ID=?;"
-	queryDeleteUser       = "DELETE FROM users WHERE ID=?;"
-	queryFindUserByStatus = "SELECT ID, first_name, last_name, email, date_created, status FROM users WHERE status=?;"
+	queryInsertUser                 = "INSERT INTO users(first_name, last_name, email, date_created, status, password) VALUES (?,?,?,?,?,?);"
+	queryGetUser                    = "SELECT ID, first_name, last_name, email, date_created, status FROM users WHERE ID=?;"
+	queryUpdateUser                 = "UPDATE users SET first_name=?, last_name=?, email=? WHERE ID=?;"
+	queryDeleteUser                 = "DELETE FROM users WHERE ID=?;"
+	queryFindUserByStatus           = "SELECT ID, first_name, last_name, email, date_created, status FROM users WHERE status=?;"
+	queryFindUserByEmailAndPassword = "SELECT ID, first_name, last_name, email, date_created, status FROM users WHERE email=? AND password=? AND status=?;"
 )
 
 //Get - Gets user by ID from DB - act like method
@@ -40,7 +42,7 @@ func (user *User) Get() *errors.RestError {
 
 	//Populates the user given with the data from DB
 	if getErr := result.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated, &user.Status); getErr != nil {
-		if strings.Contains(getErr.Error(), "no rows in result set"){
+		if strings.Contains(getErr.Error(), "no rows in result set") {
 			return errors.NewNotFoundError(fmt.Sprintf("user %d not found", user.ID))
 		}
 
@@ -128,7 +130,7 @@ func (user *User) FindByStatus(status string) ([]User, *errors.RestError) {
 	stmt, err := users_db.Client.Prepare(queryFindUserByStatus)
 	if err != nil {
 		logger.Error("error when trying to prepare the search user statement", err)
-		return nil,errors.NewInternalServerError("database error")
+		return nil, errors.NewInternalServerError("database error")
 	}
 
 	defer stmt.Close()
@@ -155,4 +157,35 @@ func (user *User) FindByStatus(status string) ([]User, *errors.RestError) {
 
 	return results, nil
 
+}
+
+//Login - find a user
+func (user *User) FindByEmailAndPassword() *errors.RestError {
+
+	//Prepares the query
+	stmt, err := users_db.Client.Prepare(queryFindUserByEmailAndPassword)
+
+	if err != nil {
+		logger.Error("error when trying to prepare the get user by email and password statement", err)
+		return errors.NewInternalServerError("database error")
+	}
+
+	//Close the stametent when the function returns
+	defer stmt.Close()
+
+	//Make a select and looks for only one result
+	result := stmt.QueryRow(user.Email, user.Password, StatusActive)
+
+	//Populates the user given with the data from DB
+	if getErr := result.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.DateCreated, &user.Status); getErr != nil {
+		if strings.Contains(getErr.Error(), mysql_utils.ErrorNoRows) {
+			return errors.NewNotFoundError(fmt.Sprintf("user corresponding to %s not found", user.Email))
+		}
+
+		logger.Error("error when trying to get user by email and password", getErr)
+		return errors.NewInternalServerError("database error")
+
+	}
+
+	return nil
 }

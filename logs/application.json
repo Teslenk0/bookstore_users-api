@@ -7,3 +7,10 @@
 {"level":"info","time":"2019-12-29T19:38:46.318-0300","msg":"about to start the application"}
 {"level":"error","time":"2019-12-29T19:38:50.345-0300","msg":"error when trying to get user by id","error":"sql: no rows in result set"}
 {"level":"info","time":"2019-12-29T19:44:25.223-0300","msg":"about to start the application"}
+{"level":"info","time":"2020-01-03T15:45:23.502-0300","msg":"about to start the application"}
+{"level":"info","time":"2020-01-04T09:55:45.189-0300","msg":"about to start the application"}
+{"level":"info","time":"2020-01-04T09:57:46.464-0300","msg":"about to start the application"}
+{"level":"info","time":"2020-01-04T09:58:37.034-0300","msg":"about to start the application"}
+{"level":"info","time":"2020-01-04T10:31:18.872-0300","msg":"about to start the application"}
+{"level":"info","time":"2020-01-04T14:46:25.252-0300","msg":"about to start the application"}
+{"level":"info","time":"2020-01-05T14:16:16.222-0300","msg":"about to start the application"}

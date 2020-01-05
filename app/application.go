@@ -21,5 +21,5 @@ func StartApplication() {
 	logger.Info("about to start the application")
 
 	//Run the server in port 8080
-	router.Run(":8080")
+	router.Run(":8082")
 }
